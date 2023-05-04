@@ -1,0 +1,5 @@
+min 50 CORS ca sa comunice corect back cu front cand sunt pe aceasi port 
+
+ponesti backend si frontend separat
+pt backend mergi in api si nodemon index.js
+pt frontend mergi in client si yarn run si dupa alegi vite
