@@ -18,7 +18,7 @@ import BookingPage from './pages/BookingPage'
 
 
 //so you dont need to write http://127.0.0.1:4000 before every axios request, only give a route
-axios.defaults.baseURL = "http://localhost:4000";
+axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
 axios.defaults.withCredentials = true;
 
 function App() {
