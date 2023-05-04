@@ -28,7 +28,7 @@ const bucket='airbnb-clone-project'
 
 
 // to upload the image
-app.use("/uploads", express.static(__dirname + "/uploads"));
+app.use("/api/uploads", express.static(__dirname + "/uploads"));
 
 //connect frontend with backend
 app.use(
@@ -41,7 +41,7 @@ app.use(
 
 
 //test for backend
-app.get("/test", (req, res) => {
+app.get("/api/test", (req, res) => {
   //connect to data base
   mongoose.connect(process.env.MONGO_URL);
   res.json("test ok");
@@ -84,7 +84,7 @@ async function uploadToS3(path, originalFilename, mimetype){
 
 
 //register
-app.post("/register", async (req, res) => {
+app.post("/api/register", async (req, res) => {
   //connect to data base
   mongoose.connect(process.env.MONGO_URL);
 
@@ -102,7 +102,7 @@ app.post("/register", async (req, res) => {
 });
 
 // Login
-app.post("/login", async (req, res) => {
+app.post("/api/login", async (req, res) => {
   //connect to data base
   mongoose.connect(process.env.MONGO_URL);
   const { email, password } = req.body;
@@ -135,7 +135,7 @@ app.post("/login", async (req, res) => {
 });
 
 //verifica daca esti log-at si se foloseste de cookie
-app.get("/profile", (req, res) => {
+app.get("/api/profile", (req, res) => {
   //connect to data base
   mongoose.connect(process.env.MONGO_URL);
 
@@ -152,12 +152,12 @@ app.get("/profile", (req, res) => {
 });
 
 //logout
-app.post("/logout", (req, res) => {
+app.post("/api/logout", (req, res) => {
   res.cookie("token", "").json(true);
 });
 
 // upload-by-link
-app.post("/upload-by-link", async (req, res) => {
+app.post("/api/upload-by-link", async (req, res) => {
 
   const { link } = req.body;
   const newName = "photo" + Date.now() + ".jpg";
@@ -165,15 +165,13 @@ app.post("/upload-by-link", async (req, res) => {
     url: link,
     dest: "/tmp/" + newName,
   });
-
- const url= await uploadToS3('/tmp/'+newName, newName, mime.lookup("/tmp/" + newName))
-
+  const url= await uploadToS3('/tmp/'+newName, newName, mime.lookup("/tmp/" + newName))
   res.json(url);
 });
 
 // upload from PC
 const photosMiddleware = multer({ dest: "/tmp" });
-app.post("/upload",photosMiddleware.array("photos", 100) ,async (req, res) => {
+app.post("/api/upload",photosMiddleware.array("photos", 100) ,async (req, res) => {
   const uploadedFiles = [];
   for (let i = 0; i < req.files.length; i++) {
     const { path, originalname, mimemtype } = req.files[i];
@@ -185,7 +183,7 @@ app.post("/upload",photosMiddleware.array("photos", 100) ,async (req, res) => {
 });
 
 // add new place
-app.post("/places", async (req, res) => {
+app.post("/api/places", async (req, res) => {
   //connect to data base
   mongoose.connect(process.env.MONGO_URL);
 
@@ -222,7 +220,7 @@ app.post("/places", async (req, res) => {
 });
 
 // get list of all user places
-app.get("/user-places", async (req, res) => {
+app.get("/api/user-places", async (req, res) => {
   //connect to data base
   mongoose.connect(process.env.MONGO_URL);
 
@@ -234,7 +232,7 @@ app.get("/user-places", async (req, res) => {
 });
 
 //get data to fill the form so you can edit
-app.get("/places/:id", async (req, res) => {
+app.get("/api/places/:id", async (req, res) => {
   //connect to data base
   mongoose.connect(process.env.MONGO_URL);
 
@@ -243,7 +241,7 @@ app.get("/places/:id", async (req, res) => {
 });
 
 //update data
-app.put("/places", async (req, res) => {
+app.put("/api/places", async (req, res) => {
   //connect to data base
   mongoose.connect(process.env.MONGO_URL);
 
@@ -285,7 +283,7 @@ app.put("/places", async (req, res) => {
 });
 
 //show all acomadation for index page
-app.get("/places", async (req, res) => {
+app.get("/api/places", async (req, res) => {
   //connect to data base
   mongoose.connect(process.env.MONGO_URL);
 
@@ -293,7 +291,7 @@ app.get("/places", async (req, res) => {
 });
 
 //booking a place
-app.post("/bookings", async (req, res) => {
+app.post("/api/bookings", async (req, res) => {
   //connect to data base
   mongoose.connect(process.env.MONGO_URL);
 
@@ -314,7 +312,7 @@ app.post("/bookings", async (req, res) => {
 });
 
 //get all bookings
-app.get("/bookings", async (req, res) => {
+app.get("/api/bookings", async (req, res) => {
   //connect to data base
   mongoose.connect(process.env.MONGO_URL);
   const userData = await getUserDataFromReq(req);
@@ -322,19 +320,19 @@ app.get("/bookings", async (req, res) => {
 });
 
 //delete/cancel booking
-app.delete('/account/bookings/:id', async (req, res)=>{
+app.delete('/api/account/bookings/:id', async (req, res)=>{
   const{id}=req.params
   res.json(await Booking.findByIdAndDelete({_id:id}))
 })
 
 //get all booking for a place
-app.get('/place/:id',async(req,res)=>{
+app.get('/api/place/:id',async(req,res)=>{
   const{id}=req.params
   res.json(await Booking.find({place:id}))
 })
 
 //delete accommodation
-app.delete('/account/places/:id',async (req, res)=>{
+app.delete('/api/account/places/:id',async (req, res)=>{
   const {id}=req.params
   res.json(await Place.findByIdAndDelete({_id:id}))
 })
